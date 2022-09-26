@@ -25,12 +25,21 @@ def ingest_data():
     df.columns = list_col
     df = df.fillna(method = 'ffill')
         
-    df.principales_palabras_clave = df.principales_palabras_clave.apply(
+    df['principales_palabras_clave'] = df['principales_palabras_clave'].apply(
         lambda words: ' ' + words
     )
         
     df = df.groupby(['cluster','cantidad_de_palabras_clave','porcentaje_de_palabras_clave'], as_index=False)[['principales_palabras_clave']].sum()
     df['cantidad_de_palabras_clave'] = df['cantidad_de_palabras_clave'].astype(int)
     df['porcentaje_de_palabras_clave'] = df['porcentaje_de_palabras_clave'].str.replace(',', '.').apply(lambda x: float(x[:-2]))
-    df
+    df['principales_palabras_clave'] = df['principales_palabras_clave'].str.replace(".", "", regex=True)
+    df['principales_palabras_clave'] = df['principales_palabras_clave'].str.replace("   "," ")
+    df['principales_palabras_clave'] = df['principales_palabras_clave'].str.replace("  "," ")
+    df['principales_palabras_clave'] = df['principales_palabras_clave'].str.replace("  "," ")
+    df['principales_palabras_clave'] = df['principales_palabras_clave'].str.strip()
+
+
+    df.cluster = df.cluster.astype(int)
+    df = df.sort_values('cluster')
+    df = df.reset_index(drop=True)
     return df
